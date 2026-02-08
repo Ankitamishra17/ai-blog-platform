@@ -1,0 +1,5 @@
+backend/blogapp-84aef-firebase-adminsdk-fbsvc-1a535e2fee.json
+backend/*.json
+backend/.env
+frontend/.env
+node_modules
