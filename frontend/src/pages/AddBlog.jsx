@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import EditorJS from "@editorjs/editorjs";
 import EditorjsList from "@editorjs/list";
 import NesteList from "@editorjs/nested-list";
-import CodeTool from '@editorjs/code';
+import CodeTool from "@editorjs/code";
 import Marker from "@editorjs/marker";
 import Header from "@editorjs/header";
 
@@ -23,7 +23,7 @@ function AddBlog() {
 
   //const selectedBlog = useSelector((slice) => slice.selectedBlog);
   const { title, description, image } = useSelector(
-    (slice) => slice.selectedBlog
+    (slice) => slice.selectedBlog,
   );
 
   const [blogData, setblogData] = useState({
@@ -37,14 +37,14 @@ function AddBlog() {
     //console.log(blogData);
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/v1/blogs",
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs`,
         blogData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       URL.createObjectURL(blogData.image);
@@ -66,7 +66,7 @@ function AddBlog() {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       URL.createObjectURL(blogData.image);
@@ -119,7 +119,7 @@ function AddBlog() {
           },
         },
         code: CodeTool,
-        Marker : Marker,
+        Marker: Marker,
       },
       onChange: async () => {
         let data = await editorjsRef.current.save();

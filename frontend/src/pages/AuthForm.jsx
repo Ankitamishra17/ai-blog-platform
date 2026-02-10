@@ -22,9 +22,12 @@ function AuthForm({ type }) {
     try {
       let data = await googleAuth();
       //console.log(data);
-      const res = await axios.post(`http://localhost:3000/api/v1/google-auth`, {
-        accessToken: data.accessToken,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/google-auth`,
+        {
+          accessToken: data.accessToken,
+        },
+      );
       console.log(res);
       dispatch(login(res.data.user));
       toast.success(res.data.message);

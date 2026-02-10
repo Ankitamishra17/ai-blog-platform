@@ -11,7 +11,8 @@ function HomePage() {
 
   async function fetchBlogs() {
     let res = await axios.get(
-      `http://localhost:3000/api/v1/blogs?page=${page}&limit=3`,
+      // `http://localhost:3000/api/v1/blogs?page=${page}&limit=3`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs?page=${page}&limit=3`,
     );
     //let res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/blogs`)
 

@@ -38,7 +38,12 @@ function BlogPage() {
     try {
       let {
         data: { blog },
-      } = await axios.get(`http://localhost:3000/api/v1/blogs/${id}`);
+      } =
+        //  await axios.get(`http://localhost:3000/api/v1/blogs/${id}`);
+        await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs/${id}`,
+        );
+
       setBlogData(blog);
       //setLikes(blog.likes.length);//no
       if (blog.likes.includes(userId)) {

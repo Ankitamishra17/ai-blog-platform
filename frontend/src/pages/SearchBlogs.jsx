@@ -11,7 +11,7 @@ function SearchBlogs() {
     async function fetchSearchBlogs() {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/v1/search-blog?search=${q}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/v1/search-blog?search=${q}`,
         );
         setBlogs(res.data.blogs);
       } catch (error) {
