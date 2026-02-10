@@ -18,7 +18,9 @@ function HomePage() {
 
     //console.log(res.data.blogs)
 
-    setBlogs((prev) => [...prev, ...res.data.blogs]);
+    // setBlogs((prev) => [...prev, ...res.data.blogs]);
+    setBlogs((prev) => [...prev, ...(res.data.blogs || [])]);
+
     setHasMore(res.data.hasMore);
   }
 
