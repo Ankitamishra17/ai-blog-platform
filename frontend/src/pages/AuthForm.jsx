@@ -89,7 +89,7 @@ function AuthForm({ type }) {
 
   return (
     <div className="w-full">
-      <div className=" bg-gray-100 mx-auto p-4 rounded-xl max-w-[350px] flex flex-col  items-center gap-5 mt-52">
+      <div className=" bg-gray-100 mx-auto p-4 rounded-xl max-w-[350px] flex flex-col  items-center gap-5 mt-10">
         <h1 className="text-3xl">
           {type === "signin" ? "Sign in" : "Sign up"}
         </h1>

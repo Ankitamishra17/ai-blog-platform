@@ -1,29 +1,29 @@
-import React from "react";
-
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 
-import AuthForm from "./pages/AuthForm";
-import Navbar from "./components/Navbar";
-import HomePage from "./components/HomePage";
-import AddBlog from "./pages/AddBlog";
-import BlogPage from "./pages/BlogPage";
-import SearchBlogs from "./pages/SearchBlogs";
+// 🔥 Lazy Imports
+const AuthForm = lazy(() => import("./pages/AuthForm"));
+const Navbar = lazy(() => import("./components/Navbar"));
+const HomePage = lazy(() => import("./components/HomePage"));
+const AddBlog = lazy(() => import("./pages/AddBlog"));
+const BlogPage = lazy(() => import("./pages/BlogPage"));
+const SearchBlogs = lazy(() => import("./pages/SearchBlogs"));
 
 function App() {
   return (
-    // <div className=" w-screen h-screen flex">
-    <Routes>
-      <Route path="/" element={<Navbar />}>
-        <Route path="/" element={<HomePage />}></Route>
-        <Route path="/signin" element={<AuthForm type={"signin"} />}></Route>
-        <Route path="/signup" element={<AuthForm type={"signup"} />}></Route>
-        <Route path="/add-blog" element={<AddBlog />}></Route>
-        <Route path="/blog/:id" element={<BlogPage />}></Route>
-        <Route path="/edit/:id" element={<AddBlog />}></Route>
-        <Route path="/search" element={<SearchBlogs />}></Route>
-      </Route>
-    </Routes>
-    //</div>
+    <Suspense fallback={<div className="text-center mt-10">Loading...</div>}>
+      <Routes>
+        <Route path="/" element={<Navbar />}>
+          <Route index element={<HomePage />} />
+          <Route path="signin" element={<AuthForm type={"signin"} />} />
+          <Route path="signup" element={<AuthForm type={"signup"} />} />
+          <Route path="add-blog" element={<AddBlog />} />
+          <Route path="blog/:id" element={<BlogPage />} />
+          <Route path="edit/:id" element={<AddBlog />} />
+          <Route path="search" element={<SearchBlogs />} />
+        </Route>
+      </Routes>
+    </Suspense>
   );
 }
 
