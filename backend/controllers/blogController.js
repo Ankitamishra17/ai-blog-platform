@@ -18,15 +18,6 @@ const {
 async function createBlog(req, res) {
   //console.log( req.body);
   try {
-    //console.log("create Blog")
-
-    //     let isValid = await verifyJWT(req.body.token);
-
-    //     if(!isValid){
-    //         return res.status(200).json({
-    //             message:"Invalid Token"
-    //         })
-    //    }
     const creator = req.user;
     const { title, description, draft, content } = req.body;
     const image = req.file;
@@ -63,6 +54,11 @@ async function createBlog(req, res) {
 
     //cloudinary setup
     const { secure_url, public_id } = await uploadImage(image.path);
+    // Optimize image
+    const optimizedImage = secure_url.replace(
+      "/upload/",
+      "/upload/f_auto,q_auto/",
+    );
 
     fs.unlinkSync(image.path);
 
@@ -71,23 +67,16 @@ async function createBlog(req, res) {
     const blogId =
       title.toLowerCase().split(" ").join("-") + "-" + randomUUID();
 
-    //    console.log(blogId + "-" + randomUUID());
-    // const blogId = title.toLowerCase().split(" ").join("-")
-    // console.log(blogId + "-" + randomUUID());
-
     const blog = await Blog.create({
       description,
       title,
       draft,
       creator,
-      image: secure_url,
+      image: optimizedImage,
       imageId: public_id,
       blogId,
       content,
     });
-
-    //await User.findByIdAndUpdate(creator, {$push: {blogs : blog._id}})
-
     return res.status(200).json({
       message: "Blog created successfully",
       blog,
@@ -108,6 +97,8 @@ async function getBlogs(req, res) {
     const skip = (page - 1) * limit;
 
     const blogs = await Blog.find({ draft: false })
+      .select("-content") // remove large content from list page
+
       .populate({
         path: "creator",
         // select:"name",
@@ -119,7 +110,8 @@ async function getBlogs(req, res) {
       })
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
     const totalBlogs = await Blog.countDocuments({ draft: false });
 
     return res.status(200).json({
@@ -212,17 +204,6 @@ async function updateBlog(req, res) {
       message: error.message,
     });
   }
-  //   const { id } = req.params;
-  //   // let index = blogs.findIndex(blog => blog.id == id)
-  //   // blogs[index] = {...blogs[index] , ...req.body}
-  //   //console.log(blogs)
-  //   //other method to update
-  //   let updatedBlogs = blogs.map((blog, index) =>
-  //     blog.id == id ? { ...blogs[index], ...req.body } : blog
-  //   );
-
-  //   blogs = [...updatedBlogs];
-  //   return res.json({ message: "Blog updated successfully", updatedBlogs });
 }
 
 async function deleteBlog(req, res) {
@@ -288,10 +269,6 @@ async function likeBlog(req, res) {
       });
     }
 
-    // return res.status(208).json({
-    //     success: true,
-    //     message: "Blog delete successfully"
-    // });
   } catch (error) {
     return res.status(500).json({
       message: error.message,

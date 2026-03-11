@@ -7,6 +7,7 @@ const dbConnect = require("./config/dbConnect");
 //const User = require("./models/userSchema");
 const userRoute = require("./routes/userRoutes");
 const blogRoute = require("./routes/blogRoutes.js");
+const aiRoute = require("./routes/aiRoutes");
 const cloudinaryConfig = require("./config/cloudinaryConfig.js");
 const app = express();
 // const dotenv = require('dotenv');
@@ -20,6 +21,7 @@ app.use(cors());
 
 app.use("/api/v1", userRoute);
 app.use("/api/v1", blogRoute);
+app.use("/api/v1/ai",aiRoute);
 
 // async function dbConnect(){
 //   try{
