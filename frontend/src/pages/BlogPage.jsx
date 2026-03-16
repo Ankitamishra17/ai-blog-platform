@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -16,7 +17,7 @@ function BlogPage() {
   const { id } = useParams();
   //console.log(id)
   //console.log("Params from useParams():", useParams());
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // const user = JSON.parse(localStorage.getItem("user"));
@@ -96,6 +97,37 @@ function BlogPage() {
     };
   }, [id]);
 
+  async function handleDeleteBlog() {
+    try {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this blog?",
+      );
+
+      if (!confirmDelete) return;
+
+      console.log("Token:", token);
+      console.log("Logged userId:", userId);
+      console.log("Blog creator:", blogData.creator._id);
+      console.log("Blog ID being sent:", blogData._id);
+
+      const res = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs/${blogData._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log("Token:", token);
+      console.log("Blog ID:", blogData._id);
+      toast.success(res.data.message);
+
+      navigate("/");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Delete failed");
+    }
+  }
+
   return (
     <div className="max-w-[700px] mx-auto">
       {blogData ? (
@@ -106,12 +138,21 @@ function BlogPage() {
           <h2 className="my-5 text-3xl">{blogData.creator.name}</h2>
           <img src={blogData.image} alt="" />
 
-          {token && email === blogData.creator.email && (
-            <Link to={`/edit/${blogData.blogId}`}>
-              <button className="bg-green-500 mt-5 px-6 py-2 text-xl">
-                Edit
+          {token && userId === blogData.creator._id && (
+            <div className="flex gap-4 mt-5">
+              <Link to={`/edit/${blogData.blogId}`}>
+                <button className="bg-green-500 px-6 py-2 text-xl text-white">
+                  Edit
+                </button>
+              </Link>
+
+              <button
+                onClick={handleDeleteBlog}
+                className="bg-red-500 px-6 py-2 text-xl text-white"
+              >
+                Delete
               </button>
-            </Link>
+            </div>
           )}
           <div className="flex gap-7 mt-4">
             <div className=" cursor-pointer flex gap-2" onClick={handleLike}>
@@ -133,7 +174,7 @@ function BlogPage() {
           </div>
 
           <div>
-            {content.blocks.map((block) => {
+            {content?.blocks?.map((block, index) => {
               if (block.type == "header") {
                 if (block.data.level === 2) {
                   return (

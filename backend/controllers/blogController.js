@@ -13,6 +13,20 @@ const {
   deleteImagefromCloudinary,
 } = require("../utils/uploadImage");
 
+// helper function for safe blog slug
+function generateSlug(title) {
+  return (
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, "") // remove special characters like /
+      .trim()
+      .split(" ")
+      .join("-") +
+    "-" +
+    randomUUID()
+  );
+}
+
 //verifyJWT
 
 async function createBlog(req, res) {
@@ -28,7 +42,7 @@ async function createBlog(req, res) {
     if (!title) {
       return res.status(400).json({
         message: "Please fill title fields",
-        blog,
+        // blog,
       });
     }
     if (!description) {
@@ -42,6 +56,9 @@ async function createBlog(req, res) {
         message: "Please add some content ",
         blog,
       });
+    }
+    if (!image) {
+      return res.status(400).json({ message: "Please upload blog image" });
     }
 
     const findUser = await User.findById(creator);
@@ -64,8 +81,7 @@ async function createBlog(req, res) {
 
     // const blogId = title.tolowerCase().replace(/ +/g, '-');
     //other method
-    const blogId =
-      title.toLowerCase().split(" ").join("-") + "-" + randomUUID();
+    const blogId = generateSlug(title);
 
     const blog = await Blog.create({
       description,
@@ -174,6 +190,7 @@ async function updateBlog(req, res) {
     console.log(user);
 
     const blog = await Blog.findOne({ blogId: id });
+    // const blog = await Blog.findByID(id);
     if (!(creator == blog.creator)) {
       return res.status(403).json({
         message: "you are not authorized for this action",
@@ -208,32 +225,70 @@ async function updateBlog(req, res) {
 
 async function deleteBlog(req, res) {
   try {
-    const creator = req.user;
     const { id } = req.params;
+    // const creator = req.user;
+    // const creator = req.user.id;
+    // const { id } = req.params;
 
-    const blog = await Blog.findById(id);
+    console.log("Delete blogId:", id);
+    console.log("req.user:", req.user);
+    console.log("req.user.id:", req.user?.id);
+    // find blog using blogId
+    //const blog = await Blog.findOne({ blogId: id });
+    // const blog = await Blog.findById(id);
+    const blog = await Blog.findOne({
+      $or: [{ _id: id }, { blogId: id }],
+    });
 
     if (!blog) {
-      return res.status(500).json({
-        message: "Blog is not found",
+      return res.status(404).json({
+        message: "Blog not found",
       });
     }
+    console.log("blog.creator:", blog.creator.toString());
 
-    if (!(creator === blog.creator)) {
+    // authorization check
+    //if (blog.creator.toString() !== creator.toString()) {
+
+    // if (creator !== blog.creator) {
+    // if (blog.creator.toString() !== creator.toString()) {
+    //   return res.status(403).json({
+    //     message: "You are not authorized",
+    //   });
+    // }
+
+    if (blog.creator.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         message: "you are not authorized for this action",
       });
     }
 
-    await deleteImagefromCloudinary(blog.imageId);
-    await Blog.findByIdAndDelete(id);
-    await User.findByIdAndUpdate(creator, { $pull: { blogs: id } });
+    // delete image from cloudinary
+    if (blog.imageId) {
+      await deleteImagefromCloudinary(blog.imageId);
+    }
 
-    return res.status(208).json({
+    // delete blog
+    //await Blog.deleteOne({ blogId: id });
+    // await Blog.findByIdAndDelete(id);
+    // await blog.deleteOne();
+    await Blog.findByIdAndDelete(blog._id);
+
+    // remove blog reference from user
+    // await User.findByIdAndUpdate(creator, {
+    //    $pull: { blogs: blog._id },
+    // });
+
+    await User.findByIdAndUpdate(req.user.id, {
+      $pull: { blogs: blog._id },
+    });
+
+    return res.status(200).json({
       success: true,
-      message: "Blog delete successfully",
+      message: "Blog deleted successfully",
     });
   } catch (error) {
+    console.error("Delete error:", error);
     return res.status(500).json({
       message: error.message,
     });
@@ -268,7 +323,6 @@ async function likeBlog(req, res) {
         isLiked: false,
       });
     }
-
   } catch (error) {
     return res.status(500).json({
       message: error.message,
