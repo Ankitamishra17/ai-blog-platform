@@ -62,14 +62,43 @@ function AddBlog() {
   }
 
   // 🔹 Post Blog
+  // async function handlePostBlog() {
+  //   try {
+  //     const res = await axios.post(
+  //       `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs`,
+  //       blogData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       },
+  //     );
+
+  //     toast.success(res.data.message);
+  //     navigate("/");
+  //   } catch (error) {
+  //     toast.error(error?.response?.data?.message || "Error posting blog");
+  //   }
+  // }
+
   async function handlePostBlog() {
     try {
+      const formData = new FormData();
+
+      formData.append("title", blogData.title);
+      formData.append("description", blogData.description);
+      formData.append("content", JSON.stringify(blogData.content));
+
+      if (blogData.image) {
+        formData.append("image", blogData.image);
+      }
+
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs`,
-        blogData,
+        formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         },
@@ -83,14 +112,43 @@ function AddBlog() {
   }
 
   // 🔹 Update Blog
+  // async function handleUpdateBlog() {
+  //   try {
+  //     const res = await axios.patch(
+  //       `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs/${id}`,
+  //       blogData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       },
+  //     );
+
+  //     toast.success(res.data.message);
+  //     navigate("/");
+  //   } catch (error) {
+  //     toast.error(error?.response?.data?.message || "Error updating blog");
+  //   }
+  // }
+
   async function handleUpdateBlog() {
     try {
+      const formData = new FormData();
+
+      formData.append("title", blogData.title);
+      formData.append("description", blogData.description);
+      formData.append("content", JSON.stringify(blogData.content));
+
+      if (blogData.image) {
+        formData.append("image", blogData.image);
+      }
+
       const res = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs/${id}`,
-        blogData,
+        formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         },
@@ -103,13 +161,18 @@ function AddBlog() {
     }
   }
 
+
+
+
+  
+
   // 🔹 Fetch Blog Data
   function fetchBlogById() {
     setBlogData({
       title,
       description,
       image,
-      content: "",
+      content: {},
     });
   }
 

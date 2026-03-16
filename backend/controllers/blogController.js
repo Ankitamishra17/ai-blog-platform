@@ -29,75 +29,160 @@ function generateSlug(title) {
 
 //verifyJWT
 
+// async function createBlog(req, res) {
+//   //console.log( req.body);
+//   try {
+//     const creator = req.user;
+//     const { title, description, draft, content } = req.body;
+//     const image = req.file;
+//     console.log({ title, description });
+
+//     //  console.log({title, description,draft,image})
+
+//     if (!title) {
+//       return res.status(400).json({
+//         message: "Please fill title fields",
+//         // blog,
+//       });
+//     }
+//     if (!description) {
+//       return res.status(400).json({
+//         message: "Please fill description fields ",
+//         blog,
+//       });
+//     }
+//     if (!content) {
+//       return res.status(400).json({
+//         message: "Please add some content ",
+//         blog,
+//       });
+//     }
+//     if (!image) {
+//       return res.status(400).json({ message: "Please upload blog image" });
+//     }
+
+//     const findUser = await User.findById(creator);
+
+//     if (!findUser) {
+//       return res.status(500).json({
+//         message: "Invalid creator ID",
+//       });
+//     }
+
+//     //cloudinary setup
+//     const { secure_url, public_id } = await uploadImage(image.path);
+//     // Optimize image
+//     const optimizedImage = secure_url.replace(
+//       "/upload/",
+//       "/upload/f_auto,q_auto/",
+//     );
+
+//     fs.unlinkSync(image.path);
+
+//     // const blogId = title.tolowerCase().replace(/ +/g, '-');
+//     //other method
+//     const blogId = generateSlug(title);
+
+//     const blog = await Blog.create({
+//       description,
+//       title,
+//       draft,
+//       creator,
+//       image: optimizedImage,
+//       imageId: public_id,
+//       blogId,
+//       content,
+//     });
+//     return res.status(200).json({
+//       message: "Blog created successfully",
+//       blog,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: error.message,
+//     });
+//   }
+// }
+
 async function createBlog(req, res) {
-  //console.log( req.body);
   try {
-    const creator = req.user;
+    console.log("req.user:", req.user);
+    console.log("creator:", req.user?.id);
+
+    // req.user contains JWT payload → we need only id
+    const creator = req.user.id;
+
     const { title, description, draft, content } = req.body;
     const image = req.file;
-    console.log({ title, description });
-
-    //  console.log({title, description,draft,image})
 
     if (!title) {
       return res.status(400).json({
         message: "Please fill title fields",
-        // blog,
       });
-    }
-    if (!description) {
-      return res.status(400).json({
-        message: "Please fill description fields ",
-        blog,
-      });
-    }
-    if (!content) {
-      return res.status(400).json({
-        message: "Please add some content ",
-        blog,
-      });
-    }
-    if (!image) {
-      return res.status(400).json({ message: "Please upload blog image" });
     }
 
+    if (!description) {
+      return res.status(400).json({
+        message: "Please fill description fields",
+      });
+    }
+
+    if (!content) {
+      return res.status(400).json({
+        message: "Please add some content",
+      });
+    }
+
+    if (!image) {
+      return res.status(400).json({
+        message: "Please upload blog image",
+      });
+    }
+
+    // check user exists
     const findUser = await User.findById(creator);
 
     if (!findUser) {
-      return res.status(500).json({
+      return res.status(400).json({
         message: "Invalid creator ID",
       });
     }
 
-    //cloudinary setup
+    // upload image to cloudinary
     const { secure_url, public_id } = await uploadImage(image.path);
-    // Optimize image
+
     const optimizedImage = secure_url.replace(
       "/upload/",
       "/upload/f_auto,q_auto/",
     );
 
+    // remove temp file
     fs.unlinkSync(image.path);
 
-    // const blogId = title.tolowerCase().replace(/ +/g, '-');
-    //other method
+    // generate slug
     const blogId = generateSlug(title);
 
+    // EditorJS content comes as string → convert to JSON
+    const parsedContent = JSON.parse(content);
+
     const blog = await Blog.create({
-      description,
       title,
+      description,
       draft,
       creator,
       image: optimizedImage,
       imageId: public_id,
       blogId,
-      content,
+      content: parsedContent,
     });
+
     return res.status(200).json({
       message: "Blog created successfully",
       blog,
     });
   } catch (error) {
+    console.error(error);
+
     return res.status(500).json({
       message: error.message,
     });
@@ -180,7 +265,7 @@ async function getBlog(req, res) {
 
 async function updateBlog(req, res) {
   try {
-    const creator = req.user;
+    const creator = req.user.id;
     const image = req.file;
 
     const { id } = req.params;
@@ -191,7 +276,8 @@ async function updateBlog(req, res) {
 
     const blog = await Blog.findOne({ blogId: id });
     // const blog = await Blog.findByID(id);
-    if (!(creator == blog.creator)) {
+    // if (!(creator == blog.creator)) {
+    if (creator !== blog.creator.toString()) {
       return res.status(403).json({
         message: "you are not authorized for this action",
       });
@@ -297,7 +383,7 @@ async function deleteBlog(req, res) {
 
 async function likeBlog(req, res) {
   try {
-    const creator = req.user;
+    const creator = req.user.id;
     const { id } = req.params;
 
     const blog = await Blog.findById(id);
