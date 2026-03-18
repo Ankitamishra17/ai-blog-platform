@@ -8,6 +8,7 @@ const HomePage = lazy(() => import("./components/HomePage"));
 const AddBlog = lazy(() => import("./pages/AddBlog"));
 const BlogPage = lazy(() => import("./pages/BlogPage"));
 const SearchBlogs = lazy(() => import("./pages/SearchBlogs"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"))
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="blog/:id" element={<BlogPage />} />
           <Route path="edit/:id" element={<AddBlog />} />
           <Route path="search" element={<SearchBlogs />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Route>
       </Routes>
     </Suspense>

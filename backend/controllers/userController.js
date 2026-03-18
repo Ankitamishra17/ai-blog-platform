@@ -4,6 +4,9 @@ const { generateJWT, verifyJWT } = require("../utils/generateJWT");
 //const transporter = require("../utils/transporter")
 const admin = require("firebase-admin");
 const { getAuth } = require("firebase-admin/auth");
+import crypto from "crypto";
+import User from "../models/userSchema.js";
+import sendEmail from "../utils/sendEmail.js";
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -123,7 +126,7 @@ async function verifyToken(req, res) {
     const user = await User.findByIdAndUpdate(
       id,
       { isVerify: true },
-      { new: true }
+      { new: true },
     );
     if (!user) {
       return res.status(400).json({
@@ -154,7 +157,7 @@ async function googleAuth(req, res) {
 
     // Verify the token with Google
     const googleUser = await axios.get(
-      `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`
+      `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
     );
 
     const { name, email, picture } = googleUser.data;
@@ -274,7 +277,7 @@ async function login(req, res) {
 
     let checkForPass = await bcrypt.compare(
       password,
-      checkForexistingUser.password
+      checkForexistingUser.password,
     );
 
     if (!checkForPass) {
@@ -368,7 +371,7 @@ async function updateUser(req, res) {
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { name, password, email },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedUser) {
@@ -418,6 +421,73 @@ async function deleteUser(req, res) {
   }
 }
 
+async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+
+    await user.save();
+
+    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+
+    await sendEmail(
+      user.email,
+      "Password Reset",
+      `Click here to reset password:\n${resetUrl}`,
+    );
+
+    res.status(200).json({ message: "Reset link sent to email" });
+  } catch (error) {
+    res.status(500).json({ message: "Error sending email" });
+  }
+}
+
+async function resetPassword (req, res) {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.password = password; // (later use bcrypt)
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
 module.exports = {
   createUser,
   getAllUsers,
@@ -427,4 +497,6 @@ module.exports = {
   login,
   verifyToken,
   googleAuth,
+  forgotPassword,
+  resetPassword,
 };

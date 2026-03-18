@@ -126,6 +126,16 @@ function AuthForm({ type }) {
             value={userData.password}
             icon={"fi-rr-lock"}
           />
+          {type === "signin" && (
+            <div className="w-full text-right">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-blue-500 hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+          )}
 
           <button
             type="submit"
