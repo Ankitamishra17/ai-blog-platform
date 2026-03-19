@@ -69,9 +69,7 @@ app.use(
 );
 
 // ✅ Handle preflight requests (VERY IMPORTANT)
-app.options("*", cors());
-
-// ✅ Body parser
+// app.options("/*", cors());
 app.use(express.json());
 
 // ✅ Routes
