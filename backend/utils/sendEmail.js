@@ -11,7 +11,7 @@ const sendEmail = async (to, subject, text) => {
     });
 
     const info = await transporter.sendMail({
-      from: "your_email@gmail.com",
+      from: "misankigithub@gmail.com",
       to,
       subject,
       text,
@@ -19,7 +19,7 @@ const sendEmail = async (to, subject, text) => {
 
     console.log("Email sent:", info.response);
   } catch (error) {
-    console.log("EMAIL ERROR:", error);
+    console.log("EMAIL ERROR:", error); // 👈 VERY IMPORTANT
     throw error;
   }
 };
