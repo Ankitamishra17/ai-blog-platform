@@ -4,9 +4,8 @@ const { generateJWT, verifyJWT } = require("../utils/generateJWT");
 //const transporter = require("../utils/transporter")
 const admin = require("firebase-admin");
 const { getAuth } = require("firebase-admin/auth");
-import crypto from "crypto";
-import User from "../models/userSchema.js";
-import sendEmail from "../utils/sendEmail.js";
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -457,15 +456,12 @@ async function forgotPassword(req, res) {
   }
 }
 
-async function resetPassword (req, res) {
+async function resetPassword(req, res) {
   try {
     const { token } = req.params;
     const { password } = req.body;
 
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
@@ -476,7 +472,8 @@ async function resetPassword (req, res) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
-    user.password = password; // (later use bcrypt)
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
@@ -486,7 +483,7 @@ async function resetPassword (req, res) {
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
-};
+}
 
 module.exports = {
   createUser,
