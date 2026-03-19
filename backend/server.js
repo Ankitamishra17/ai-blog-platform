@@ -45,28 +45,33 @@ const cloudinaryConfig = require("./config/cloudinaryConfig");
 
 const app = express();
 
-// ✅ Allow both local + deployed frontend
+// ✅ Allowed origins
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://ai-blog-platform-fvu2.onrender.com", // 🔥 your frontend deployed URL
+  "https://ai-blog-platform-seven.vercel.app",
 ];
 
+// ✅ CORS middleware (IMPORTANT)
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman)
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // allow Postman
 
       if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+        callback(null, true);
       } else {
-        return callback(new Error("CORS not allowed"));
+        callback(new Error("CORS not allowed"));
       }
     },
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
 );
 
+// ✅ Handle preflight requests (VERY IMPORTANT)
+app.options("*", cors());
+
+// ✅ Body parser
 app.use(express.json());
 
 // ✅ Routes
