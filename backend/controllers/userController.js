@@ -6,6 +6,7 @@ const admin = require("firebase-admin");
 const { getAuth } = require("firebase-admin/auth");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
+//const axios = require("axios");
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -442,7 +443,8 @@ async function forgotPassword(req, res) {
 
     await user.save();
 
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    // const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
     await sendEmail(
       user.email,
