@@ -11,6 +11,8 @@ const sendEmail = async (to, subject, text) => {
         pass: process.env.EMAIL_PASS,
       },
     });
+    console.log("EMAIL:", process.env.EMAIL);
+    console.log("PASS:", process.env.EMAIL_PASS);
 
     const info = await transporter.sendMail({
       from: process.env.EMAIL,
