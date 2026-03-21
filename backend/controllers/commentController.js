@@ -3,7 +3,7 @@ const Comment = require("../models/commentSchema");
 
 async function addcomment(req, res) {
   try {
-    const creator = req.user;
+    const creator = req.user.id;
     const { id } = req.params;
     const { comment } = req.body;
 
@@ -61,7 +61,11 @@ async function deletecomment(req, res) {
       });
     }
 
-    if (!comment.user === userId && !comment.blog.creator === userId) {
+    // if (!comment.user === userId && !comment.blog.creator === userId) {
+    if (
+      comment.user.toString() !== userId &&
+      comment.blog.creator.toString() !== userId
+    ) {
       //error in this line
       return res.status(500).json({
         message: "you are not authorized ",
@@ -96,7 +100,8 @@ async function editcomment(req, res) {
       });
     }
 
-    if (!comment.user == userId) {
+    // if (!comment.user == userId) {
+    if (comment.user.toString() !== userId) {
       return res.status(400).json({
         success: false,
         message: " you are not valid user to edit comment",
