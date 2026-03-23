@@ -35,25 +35,52 @@ function BlogPage() {
 
   //const [likes , setLikes] = useState()//no
 
+  // async function fetchBlogById() {
+  //   try {
+  //     let {
+  //       data: { blog },
+  //     } =
+  //       //  await axios.get(`http://localhost:3000/api/v1/blogs/${id}`);
+  //       await axios.get(
+  //         `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs/${id}`,
+  //       );
+
+  //     setBlogData(blog);
+  //     //setLikes(blog.likes.length);//no
+  //     if (blog.likes.includes(userId)) {
+  //       setIsLike((prev) => !prev);
+  //     }
+
+  //     dispatch(addSelectedBlog(blog));
+  //     // console.log(res)
+  //   } catch (error) {
+  //     toast.error(
+  //       error.response?.data?.message ||
+  //         error.message ||
+  //         "Something went wrong",
+  //     );
+  //   }
+  // }
   async function fetchBlogById() {
     try {
-      let {
-        data: { blog },
-      } =
-        //  await axios.get(`http://localhost:3000/api/v1/blogs/${id}`);
-        await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs/${id}`,
-        );
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs/${id}`,
+      );
+
+      console.log("FULL RESPONSE:", res.data); // 🔥 DEBUG
+
+      const blog = res.data.blog || res.data; // ✅ SAFE
 
       setBlogData(blog);
-      //setLikes(blog.likes.length);//no
-      if (blog.likes.includes(userId)) {
-        setIsLike((prev) => !prev);
+
+      if (blog.likes?.includes(userId)) {
+        setIsLike(true);
       }
 
       dispatch(addSelectedBlog(blog));
-      // console.log(res)
     } catch (error) {
+      console.log("ERROR:", error); // 🔥 VERY IMPORTANT
+
       toast.error(
         error.response?.data?.message ||
           error.message ||
@@ -66,15 +93,18 @@ function BlogPage() {
     if (token) {
       setIsLike((prev) => !prev);
 
-      let res = await axios.post(
-        `http://localhost:3000/api/v1/blogs/like/${blogData._id}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      let res =
+        // await axios.post(
+        //   `http://localhost:3000/api/v1/blogs/like/${blogData._id}`,
+        await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/v1/blogs/like/${blogData._id}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
+        );
       dispatch(changeLikes(userId));
       //  if(res.data.isLiked){
       //     setLikes((prev) => prev+1)
@@ -179,6 +209,7 @@ function BlogPage() {
                 if (block.data.level === 2) {
                   return (
                     <h2
+                      key={index}
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h2>
                   );
@@ -204,7 +235,7 @@ function BlogPage() {
           </div>
         </div>
       ) : (
-        <h1>Loading......</h1>
+        <div className="text-center mt-10 text-xl">Loading blog...</div>
       )}
 
       {isOpen && <Comment />}
