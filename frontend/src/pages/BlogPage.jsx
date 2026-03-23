@@ -166,8 +166,12 @@ function BlogPage() {
             {blogData.title}
           </h1>
           <h2 className="my-5 text-3xl">{blogData.creator.name}</h2>
-          <img src={blogData.image} alt="" />
-
+          {/* <img src={blogData.image} alt="" /> */}
+          <img
+            src={blogData.image}
+            alt=""
+            className="w-full aspect-video object-cover"
+          />
           {token && userId === blogData.creator._id && (
             <div className="flex gap-4 mt-5">
               <Link to={`/edit/${blogData.blogId}`}>
