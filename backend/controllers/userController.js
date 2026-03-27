@@ -137,6 +137,7 @@ async function googleAuth(req, res) {
 
     // ✅ Verify Firebase ID token
     const decoded = await admin.auth().verifyIdToken(idToken);
+    console.log("DECODED:", decoded);
 
     const { name, email, picture } = decoded;
 
@@ -192,6 +193,7 @@ async function googleAuth(req, res) {
     });
   } catch (err) {
     console.log("GOOGLE AUTH ERROR:", err);
+    console.log("VERIFY ERROR:", err);
 
     return res.status(500).json({
       success: false,

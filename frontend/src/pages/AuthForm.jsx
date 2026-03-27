@@ -20,14 +20,17 @@ function AuthForm({ type }) {
 
   async function handleGoogleAuth() {
     try {
+      console.log("CLICKED GOOGLE BUTTON");
       let data = await googleAuth();
       //console.log(data);
+      console.log("GOOGLE DATA:", data);
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/google-auth`,
         {
           idToken: data.idToken,
         },
       );
+      console.log("API RESPONSE:", res);
       console.log(res);
       dispatch(login(res.data.user));
       toast.success(res.data.message);
