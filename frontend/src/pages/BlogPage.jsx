@@ -159,87 +159,198 @@ function BlogPage() {
   }
 
   return (
-    <div className="max-w-[700px] mx-auto">
+    // <div className="max-w-[700px] mx-auto">
+    //   {blogData ? (
+    //     <div>
+    //       <h1 className="mt-10 font-bold text-6xl capitalize">
+    //         {blogData.title}
+    //       </h1>
+    //       <h2 className="my-5 text-3xl">{blogData.creator.name}</h2>
+    //       {/* <img src={blogData.image} alt="" /> */}
+    //       <img
+    //         src={blogData.image}
+    //         alt=""
+    //         className="w-full aspect-video object-cover"
+    //       />
+    //       {token && userId === blogData.creator._id && (
+    //         <div className="flex gap-4 mt-5">
+    //           <Link to={`/edit/${blogData.blogId}`}>
+    //             <button className="bg-green-500 px-6 py-2 text-xl text-white">
+    //               Edit
+    //             </button>
+    //           </Link>
+
+    //           <button
+    //             onClick={handleDeleteBlog}
+    //             className="bg-red-500 px-6 py-2 text-xl text-white"
+    //           >
+    //             Delete
+    //           </button>
+    //         </div>
+    //       )}
+    //       <div className="flex gap-7 mt-4">
+    //         <div className=" cursor-pointer flex gap-2" onClick={handleLike}>
+    //           {islike ? (
+    //             <i className=" fi fi-sr-thumbs-up  text-blue-600 text-3xl rounded mt-1"></i>
+    //           ) : (
+    //             <i className=" fi fi-br-social-network text-3xl mt-1"></i>
+    //           )}
+    //           <p className="text-2xl mt-1">{likes.length}</p>
+    //         </div>
+
+    //         <div className="flex gap-2">
+    //           <i
+    //             onClick={() => dispatch(setIsOpen())}
+    //             className="fi fi-sr-comment text-3xl mt-1"
+    //           ></i>
+    //           <p className="text-2xl mt-1">{comments.length}</p>
+    //         </div>
+    //       </div>
+
+    //       <div>
+    //         {content?.blocks?.map((block, index) => {
+    //           if (block.type == "header") {
+    //             if (block.data.level === 2) {
+    //               return (
+    //                 <h2
+    //                   key={index}
+    //                   dangerouslySetInnerHTML={{ __html: block.data.text }}
+    //                 ></h2>
+    //               );
+    //             } else if (block.data.level === 3) {
+    //               return (
+    //                 <h3
+    //                   dangerouslySetInnerHTML={{ __html: block.data.text }}
+    //                 ></h3>
+    //               );
+    //             } else if (block.data.level === 4) {
+    //               return (
+    //                 <h4
+    //                   dangerouslySetInnerHTML={{ __html: block.data.text }}
+    //                 ></h4>
+    //               );
+    //             }
+    //           } else if (block.type == "paragraph") {
+    //             return (
+    //               <p dangerouslySetInnerHTML={{ __html: block.data.text }}></p>
+    //             );
+    //           }
+    //         })}
+    //       </div>
+    //     </div>
+    //   ) : (
+    //     <div className="text-center mt-10 text-xl">Loading blog...</div>
+    //   )}
+
+    //   {isOpen && <Comment />}
+    // </div>
+
+    <div className="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-0">
       {blogData ? (
         <div>
-          <h1 className="mt-10 font-bold text-6xl capitalize">
+          {/* Title */}
+          <h1 className="mt-6 md:mt-10 font-bold text-2xl sm:text-3xl md:text-5xl lg:text-6xl capitalize leading-tight">
             {blogData.title}
           </h1>
-          <h2 className="my-5 text-3xl">{blogData.creator.name}</h2>
-          {/* <img src={blogData.image} alt="" /> */}
+
+          {/* Author */}
+          <h2 className="my-3 md:my-5 text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-700">
+            {blogData.creator.name}
+          </h2>
+
+          {/* Image */}
           <img
             src={blogData.image}
             alt=""
-            className="w-full aspect-video object-cover"
+            className="w-full aspect-video object-cover rounded-lg"
           />
+
+          {/* Edit/Delete Buttons */}
           {token && userId === blogData.creator._id && (
-            <div className="flex gap-4 mt-5">
+            <div className="flex flex-col sm:flex-row gap-3 mt-5">
               <Link to={`/edit/${blogData.blogId}`}>
-                <button className="bg-green-500 px-6 py-2 text-xl text-white">
+                <button className="w-full sm:w-auto bg-green-500 px-4 py-2 text-base md:text-lg text-white rounded-md">
                   Edit
                 </button>
               </Link>
 
               <button
                 onClick={handleDeleteBlog}
-                className="bg-red-500 px-6 py-2 text-xl text-white"
+                className="w-full sm:w-auto bg-red-500 px-4 py-2 text-base md:text-lg text-white rounded-md"
               >
                 Delete
               </button>
             </div>
           )}
-          <div className="flex gap-7 mt-4">
-            <div className=" cursor-pointer flex gap-2" onClick={handleLike}>
+
+          {/* Like & Comment */}
+          <div className="flex gap-6 md:gap-8 mt-5 items-center">
+            <div
+              className="cursor-pointer flex items-center gap-2"
+              onClick={handleLike}
+            >
               {islike ? (
-                <i className=" fi fi-sr-thumbs-up  text-blue-600 text-3xl rounded mt-1"></i>
+                <i className="fi fi-sr-thumbs-up text-blue-600 text-xl md:text-2xl lg:text-3xl"></i>
               ) : (
-                <i className=" fi fi-br-social-network text-3xl mt-1"></i>
+                <i className="fi fi-br-social-network text-xl md:text-2xl lg:text-3xl"></i>
               )}
-              <p className="text-2xl mt-1">{likes.length}</p>
+              <p className="text-lg md:text-xl">{likes.length}</p>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <i
                 onClick={() => dispatch(setIsOpen())}
-                className="fi fi-sr-comment text-3xl mt-1"
+                className="fi fi-sr-comment text-xl md:text-2xl lg:text-3xl cursor-pointer"
               ></i>
-              <p className="text-2xl mt-1">{comments.length}</p>
+              <p className="text-lg md:text-xl">{comments.length}</p>
             </div>
           </div>
 
-          <div>
+          {/* Content */}
+          <div className="mt-6 space-y-4 text-base md:text-lg leading-relaxed">
             {content?.blocks?.map((block, index) => {
               if (block.type == "header") {
                 if (block.data.level === 2) {
                   return (
                     <h2
                       key={index}
+                      className="text-xl md:text-2xl font-semibold"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h2>
                   );
                 } else if (block.data.level === 3) {
                   return (
                     <h3
+                      key={index}
+                      className="text-lg md:text-xl font-semibold"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h3>
                   );
                 } else if (block.data.level === 4) {
                   return (
                     <h4
+                      key={index}
+                      className="text-base md:text-lg font-semibold"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h4>
                   );
                 }
               } else if (block.type == "paragraph") {
                 return (
-                  <p dangerouslySetInnerHTML={{ __html: block.data.text }}></p>
+                  <p
+                    key={index}
+                    className="text-gray-800"
+                    dangerouslySetInnerHTML={{ __html: block.data.text }}
+                  ></p>
                 );
               }
             })}
           </div>
         </div>
       ) : (
-        <div className="text-center mt-10 text-xl">Loading blog...</div>
+        <div className="text-center mt-10 text-lg md:text-xl">
+          Loading blog...
+        </div>
       )}
 
       {isOpen && <Comment />}

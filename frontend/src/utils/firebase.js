@@ -22,8 +22,15 @@ const provider = new GoogleAuthProvider();
 
 export async function googleAuth() {
   try {
-    let data = await signInWithPopup(auth, provider);
-    return data;
+    const result = await signInWithPopup(auth, provider);
+
+    // ✅ GET ID TOKEN (MOST IMPORTANT)
+    const idToken = await result.user.getIdToken();
+
+    return {
+      user: result.user,
+      idToken, // ✅ send this to backend
+    };
   } catch (error) {
     console.log(error);
   }

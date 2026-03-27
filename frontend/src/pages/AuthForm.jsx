@@ -25,7 +25,7 @@ function AuthForm({ type }) {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/google-auth`,
         {
-          accessToken: data.accessToken,
+          idToken: data.idToken,
         },
       );
       console.log(res);

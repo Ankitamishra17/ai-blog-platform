@@ -1,6 +1,6 @@
 
 const express = require("express");
-const {createUser , getAllUsers, getUserById,updateUser,deleteUser, login,verifyToken, verifyEmail,googleAuth} = require("../controllers/userController");
+const {createUser , getAllUsers, getUserById,updateUser,deleteUser, login,verifyToken,googleAuth} = require("../controllers/userController");
 const User = require("../models/userSchema");
 const route = express.Router();
 
