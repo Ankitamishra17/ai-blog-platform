@@ -124,20 +124,97 @@ async function verifyToken(req, res) {
     });
   }
 }
+// async function googleAuth(req, res) {
+//   try {
+//     const { idToken } = req.body;
+
+//     if (!idToken) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "ID token missing",
+//       });
+//     }
+
+//     // ✅ Verify Firebase ID token
+//     const decoded = await admin.auth().verifyIdToken(idToken);
+//     console.log("DECODED:", decoded);
+
+//     const { name, email, picture } = decoded;
+
+//     if (!email) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Google authentication failed",
+//       });
+//     }
+
+//     let user = await User.findOne({ email });
+
+//     if (user) {
+//       const token = generateJWT({
+//         email: user.email,
+//         id: user._id,
+//       });
+
+//       return res.status(200).json({
+//         success: true,
+//         message: "Logged in successfully",
+//         user: {
+//           id: user._id,
+//           name: user.name,
+//           email: user.email,
+//           token,
+//         },
+//       });
+//     }
+
+//     const newUser = await User.create({
+//       name,
+//       email,
+//       googleAuth: true,
+//       avatar: picture,
+//       isVerify: true,
+//     });
+
+//     const token = generateJWT({
+//       email: newUser.email,
+//       id: newUser._id,
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Registered successfully",
+//       user: {
+//         id: newUser._id,
+//         name: newUser.name,
+//         email: newUser.email,
+//         token,
+//       },
+//     });
+//   } catch (err) {
+//     console.log("GOOGLE AUTH ERROR:", err);
+//     console.log("VERIFY ERROR:", err);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Google Auth Failed",
+//     });
+//   }
+// }
 async function googleAuth(req, res) {
   try {
-    const { idToken } = req.body;
+    const authHeader = req.headers.authorization;
 
-    if (!idToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(400).json({
         success: false,
-        message: "ID token missing",
+        message: "Access token missing",
       });
     }
 
-    // ✅ Verify Firebase ID token
+    const idToken = authHeader.split(" ")[1];
+
     const decoded = await admin.auth().verifyIdToken(idToken);
-    console.log("DECODED:", decoded);
 
     const { name, email, picture } = decoded;
 
@@ -193,7 +270,6 @@ async function googleAuth(req, res) {
     });
   } catch (err) {
     console.log("GOOGLE AUTH ERROR:", err);
-    console.log("VERIFY ERROR:", err);
 
     return res.status(500).json({
       success: false,
