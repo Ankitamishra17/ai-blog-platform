@@ -18,26 +18,51 @@ function AuthForm({ type }) {
   const dispatch = useDispatch(); //it is hook use in redux
   const navigate = useNavigate();
 
+  // async function handleGoogleAuth() {
+  //   try {
+  //     console.log("CLICKED GOOGLE BUTTON");
+  //     let data = await googleAuth();
+  //     //console.log(data);
+  //     console.log("GOOGLE DATA:", data);
+  //     const res = await axios.post(
+  //       `${import.meta.env.VITE_BACKEND_URL}/api/v1/google-auth`,
+  //       {
+  //         idToken: data.idToken,
+  //       },
+  //     );
+  //     console.log("API RESPONSE:", res);
+  //     console.log(res);
+  //     dispatch(login(res.data.user));
+  //     toast.success(res.data.message);
+  //     navigate("/");
+  //   } catch (error) {
+  //     console.log(error);
+  //     //toast.error(error.message.data.message)
+  //     toast.error(error?.response?.data?.message || "Google Auth failed");
+  //   }
+  // }
   async function handleGoogleAuth() {
     try {
       console.log("CLICKED GOOGLE BUTTON");
+
       let data = await googleAuth();
-      //console.log(data);
       console.log("GOOGLE DATA:", data);
+
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/google-auth`,
+        {},
         {
-          idToken: data.idToken,
+          headers: {
+            Authorization: `Bearer ${data.idToken}`,
+          },
         },
       );
-      console.log("API RESPONSE:", res);
-      console.log(res);
+
       dispatch(login(res.data.user));
       toast.success(res.data.message);
       navigate("/");
     } catch (error) {
       console.log(error);
-      //toast.error(error.message.data.message)
       toast.error(error?.response?.data?.message || "Google Auth failed");
     }
   }
