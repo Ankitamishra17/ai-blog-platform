@@ -83,7 +83,8 @@ function AuthForm({ type }) {
       // const res = await data.json();
 
       const res = await axios.post(
-        `http://localhost:3000/api/v1/${type}`,
+        // `http://localhost:3000/api/v1/${type}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/${type}`,
         userData,
       );
       //console.log(res.status);
